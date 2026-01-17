@@ -1,16 +1,88 @@
 import numpy as np
 
 # Importando os dados do csv
-ySign = np.loadtxt("rx_sgn_y.csv", dtype=complex)
+ySignal = np.loadtxt("rx_sgn_y.csv", dtype=complex)
+
+# Total de amostras
+total_samples = len(ySignal)
 
 # Especificacao dos parametros dados no projeto
 N = 21
 Ns = 100
 fc = 1000
-a = 0.5
-t = 1
-vx = 2
-vy = 2 
+Ts = 1/ (N*fc)
 
-print(ySign[1])
-print("fim")
+
+# Criando vetor de tempo discreto
+n = np.arange(total_samples)
+
+# Etapa 1 - Decomposicao do sinal ------------
+arg = (2 * np.pi / N) * n
+
+yReal = np.sqrt(2) * np.cos(arg) * ySignal
+
+yImg = -np.sqrt(2) * np.sin(arg) * ySignal
+
+
+
+# Etapa 2 - Filtro(Media Movel) --------------
+h = np.ones(N) / N
+
+# Convolucao
+yReal_mm = np.convolve(yReal, h, mode='full')
+
+yImg_mm = np.convolve(yImg, h, mode='full')
+
+
+
+# Amostragem ---------------------------------
+simbolos_estimados = []
+
+for m in range(Ns):
+    idx = (m * N) + (N - 1)
+
+    val_real = yReal_mm[idx]
+    val_img = yImg_mm[idx]
+
+    simbolos_estimados.append(val_real + 1j * val_img)
+
+simbolos_estimados = np.array(simbolos_estimados)
+
+
+# Etapa 3 - Decisor ------------------------------
+
+# Constelacao Ideal
+constelacao = [
+    1/np.sqrt(2) + 1j/np.sqrt(2),  #S1
+    -1/np.sqrt(2) + 1j/np.sqrt(2), #S2
+    -1/np.sqrt(2) - 1j/np.sqrt(2), #S3
+    1/np.sqrt(2) - 1j/np.sqrt(2)   #S4
+]
+
+simbolos_decodificados = []
+
+for s_estimado in simbolos_estimados:
+    distancias  = [abs(s_estimado - ponto) for ponto in constelacao]
+    indice_menor = np.argmin(distancias)
+    simbolos_decodificados.append(constelacao[indice_menor])
+
+
+# Teste da rota --------------------------------------
+cx, cy = 0, 0 # Posicoes Iniciais
+vx, vy = 2, 2 # Velocidades 
+path_x = [Ns]
+path_y = [Ns]
+alpha = 0.5
+tau = 1
+
+for sym in simbolos_decodificados:
+    vx = vx + alpha * sym.real
+    vy = vy + alpha * sym.imag
+
+    cx = cx + tau * vx
+    cy = cy + tau * vy
+
+    path_x.append(cx)
+    path_y.append(cy)
+
+print(f"Coordenada final: ({cx:.4f}, {cy:.4f})")
