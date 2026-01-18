@@ -34,13 +34,11 @@ yReal_mm = np.convolve(yReal, h, mode='full')
 
 yImg_mm = np.convolve(yImg, h, mode='full')
 
-
-
 # Amostragem ---------------------------------
 simbolos_estimados = []
 
 for m in range(Ns):
-    idx = (m * N) + (N - 1)
+    idx = (m * N) + (N - 1) 
 
     val_real = yReal_mm[idx]
     val_img = yImg_mm[idx]
@@ -82,7 +80,7 @@ for sym in simbolos_decodificados:
 
     cx = cx + tau * vx
     cy = cy + tau * vy
-
+    
     path_x.append(cx)
     path_y.append(cy)
 
@@ -121,11 +119,36 @@ plt.axis('equal')
 plt.show()
 
 # --- Gráfico da Trajetória do Drone ---
+plt.figure(figsize=(8, 8))
 
-plt.figure(figsize=(8, 6))
-plt.plot(path_x, path_y, marker='o', linestyle='-', color='orange', markersize=4)
-plt.title('Trajetória Estimada do Drone no Plano XY', fontsize=14)
+# 1. Plotar a linha da trajetória
+plt.plot(path_x, path_y, linestyle='-', color='orange', alpha=0.7, label='Caminho do Drone', zorder=1)
+plt.scatter(path_x, path_y, color='orange', s=10, alpha=0.5) # Pontos intermediários pequenos
+
+# 2. Ponto de Início
+plt.scatter(path_x[0], path_y[0], color='green', s=120, edgecolors='black', zorder=5, label=f'Início: ({path_x[0]:.4f}, {path_y[0]:.4f})')
+
+# 3. Ponto de Fim
+plt.scatter(path_x[-1], path_y[-1], color='red', s=120, edgecolors='black', zorder=5, label=f'Fim: ({path_x[-1]:.4f}, {path_y[-1]:.4f})')
+
+# 4. Anotações de texto
+plt.text(path_x[0], path_y[0] + 1, 'Início', color='green', fontweight='bold', ha='center')
+plt.text(path_x[-1], path_y[-1] + 1, 'Fim', color='red', fontweight='bold', ha='center')
+
+# --- Ajustes de Escala e Enquadramento ---
+
+# 'equal' garante que 1 metro em X seja igual a 1 metro em Y na tela
+plt.axis('equal') 
+
+# Adiciona uma margem de segurança para os rótulos não ficarem cortados
+margin = 5
+plt.xlim(min(path_x) - margin, max(path_x) + margin)
+plt.ylim(min(path_y) - margin, max(path_y) + margin)
+
+plt.title('Trajetória Estimada do Drone', fontsize=14)
 plt.xlabel('Posição X')
 plt.ylabel('Posição Y')
-plt.grid(True)
+plt.grid(True, linestyle=':', alpha=0.6)
+plt.legend(loc='best')
+
 plt.show()
