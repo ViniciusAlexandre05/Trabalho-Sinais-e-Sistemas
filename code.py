@@ -88,7 +88,7 @@ print(f"Coordenada final: ({cx:.4f}, {cy:.4f})")
 
 # Gerar graficos ---------------------------------
 
-# Constelacoes (Estimados x Esperados)
+# Constelacoes
 
 plt.figure(figsize=(8, 8))
 
@@ -118,24 +118,24 @@ plt.axis('equal')
 
 plt.show()
 
-# --- Gráfico da Trajetória do Drone ---
+# Gráfico da Trajetória do Drone
 plt.figure(figsize=(8, 8))
 
-# 1. Plotar a linha da trajetória
+# Plotar a linha da trajetória
 plt.plot(path_x, path_y, linestyle='-', color='orange', alpha=0.7, label='Caminho do Drone', zorder=1)
-plt.scatter(path_x, path_y, color='orange', s=10, alpha=0.5) # Pontos intermediários pequenos
+plt.scatter(path_x, path_y, color='orange', s=10, alpha=0.5)
 
-# 2. Ponto de Início
+# Ponto de Início
 plt.scatter(path_x[0], path_y[0], color='green', s=120, edgecolors='black', zorder=5, label=f'Início: ({path_x[0]:.4f}, {path_y[0]:.4f})')
 
-# 3. Ponto de Fim
+# Ponto de Fim
 plt.scatter(path_x[-1], path_y[-1], color='red', s=120, edgecolors='black', zorder=5, label=f'Fim: ({path_x[-1]:.4f}, {path_y[-1]:.4f})')
 
-# 4. Anotações de texto
+# Anotações de texto
 plt.text(path_x[0], path_y[0] + 1, 'Início', color='green', fontweight='bold', ha='center')
 plt.text(path_x[-1], path_y[-1] + 1, 'Fim', color='red', fontweight='bold', ha='center')
 
-# --- Ajustes de Escala e Enquadramento ---
+# Ajustes de Escala e Enquadramento ---
 
 # 'equal' garante que 1 metro em X seja igual a 1 metro em Y na tela
 plt.axis('equal') 
